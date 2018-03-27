@@ -69,7 +69,7 @@ public class GraphQLService {
         return RuntimeWiring.newRuntimeWiring()
                 .type("Query", typeWiring -> typeWiring
                         .dataFetcher("allBooks", allBooksDatFetcher)
-                        .dataFetcher("books", bookDataFetcher))
+                        .dataFetcher("book", bookDataFetcher))
                 .build();
     }
 
