@@ -18,7 +18,8 @@ public class BookResource {
     GraphQLService graphQLService;
 
     @PostMapping
-    public ResponseEntity<Object> getAllBooks(@RequestBody String query) {
+    @RequestMapping("/mongo")
+    public ResponseEntity<Object> getAllBooksMongo(@RequestBody String query) {
         ExecutionResult execute = graphQLService.getGraphQL().execute(query);
         return new ResponseEntity<>(execute, HttpStatus.OK);
     }

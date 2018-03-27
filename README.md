@@ -4,7 +4,7 @@ http://localhost:8080/rest/books
 
 Body : 
     {
-    	allBooks{
+    	mongoAllBooks{
     		isn
     		title
     		authors
@@ -16,7 +16,7 @@ http://localhost:8080/rest/books
 
 Body : 
     {
-    	book(id:"123"){
+    	mongoBook(id:"123"){
     		isn
     	}
     }

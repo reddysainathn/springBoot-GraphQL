@@ -1,11 +1,10 @@
 package com.graphql.example.graphqlexample.service;
 
-import com.graphql.example.graphqlexample.model.Book;
-import com.graphql.example.graphqlexample.respository.BookRepository;
-import com.graphql.example.graphqlexample.service.datafetcher.AllBookDataFetcher;
-import com.graphql.example.graphqlexample.service.datafetcher.BookDataFetcher;
+import com.graphql.example.graphqlexample.model.MongoBook;
+import com.graphql.example.graphqlexample.respository.MongoRepo;
+import com.graphql.example.graphqlexample.service.datafetcher.MongoAllBooksDataFetcher;
+import com.graphql.example.graphqlexample.service.datafetcher.MongoDataFetcher;
 import graphql.GraphQL;
-import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
@@ -28,17 +27,18 @@ public class GraphQLService {
     Resource resource;
 
     @Autowired
-    BookRepository bookRepository;
+    MongoRepo mongoRepo;
 
     private GraphQL graphQL;
+
     @Autowired
-    private AllBookDataFetcher allBooksDatFetcher;
+    private MongoAllBooksDataFetcher mongoAllBooksDataFetcher;
     @Autowired
-    private BookDataFetcher bookDataFetcher;
+    private MongoDataFetcher mongoBookDataFetcher;
 
     @PostConstruct
     private void loadSchema() throws IOException {
-        loadDataIntoHSQL();
+        loadDataIntoMongo();
         File schemaFile = resource.getFile();
         TypeDefinitionRegistry definitionRegistry = new SchemaParser().parse(schemaFile);
         RuntimeWiring runtimeWiring = buildRuntimeWiring();
@@ -46,30 +46,31 @@ public class GraphQLService {
         graphQL = GraphQL.newGraphQL(graphQLSchema).build();
     }
 
-    private void loadDataIntoHSQL() {
+    private void loadDataIntoMongo() {
         Stream.of(
-                new Book("123", "Book of Clouds", "Kindle Edition",
-                        new String[] {
+                new MongoBook("123", "Book of Clouds", "Kindle Edition",
+                        new String[]{
                                 "Chloe Aridjis"
                         }, "Nov 2017"),
-                new Book("124", "Cloud Arch & Engineering", "Orielly",
-                        new String[] {
+                new MongoBook("124", "Cloud Arch & Engineering", "Orielly",
+                        new String[]{
                                 "Peter", "Sam"
                         }, "Jan 2015"),
-                new Book("125", "Java 9 Programming", "Orielly",
-                        new String[] {
+                new MongoBook("125", "Java 9 Programming", "Orielly",
+                        new String[]{
                                 "Venkat", "Ram"
                         }, "Dec 2016")
         ).forEach(book -> {
-            bookRepository.save(book);
+            mongoRepo.insert(book);
         });
     }
 
     private RuntimeWiring buildRuntimeWiring() {
         return RuntimeWiring.newRuntimeWiring()
                 .type("Query", typeWiring -> typeWiring
-                        .dataFetcher("allBooks", allBooksDatFetcher)
-                        .dataFetcher("book", bookDataFetcher))
+                        .dataFetcher("mongoAllBooks", mongoAllBooksDataFetcher)
+                        .dataFetcher("mongoBook", mongoBookDataFetcher)
+                )
                 .build();
     }
 
